@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camelun (キャメルン) | ママの幸せと子供達の笑顔 そして家族の絆を願って</title>
+  
+  <style>
+    /* ==========================================================================
+       1. 基本スタイル・水彩パステルカラーパレット
+       ========================================================================== */
+    :root {
+      --bg-cream: #FFFDF8;
+      --text-brown: #5C4A42;
+      --text-sub: #7A6960;
+      
+      /* コンセプト画像のパステル4色 */
+      --nav-about: #EFA888;   /* ピーチオレンジ */
+      --nav-stories: #8FB9CF; /* ソフトブルー */
+      --nav-gallery: #F2D283; /* パステルイエロー */
+      --nav-contact: #E5A8AD; /* ソフトピンク */
+
+      /* 砂漠の丘グラデーション */
+      --dune-1: #F5D3A8;
+      --dune-2: #E8BA87;
+      --dune-3: #DBA170;
+
+      --primary-green: #78B09A;
+      --border-soft: #F0E6D8;
+      --font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-brown);
+      font-family: var(--font-family);
+      line-height: 1.8;
+      overflow-x: hidden;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ==========================================================================
+       2. ちぎり紙風ヘッダー
+       ========================================================================== */
+    .header-torn {
+      position: relative;
+      background: #FDF4EB;
+      padding: 1.2rem 2rem 2.2rem;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.04));
+      z-index: 50;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
+
+    .logo-icon { font-size: 2.2rem; transform: rotate(-5deg); }
+    .logo-text { font-size: 2.2rem; font-weight: bold; color: var(--text-brown); }
+
+    .header-tagline {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--nav-about);
+      background: #FFF;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .header-torn-edge {
+      position: absolute;
+      bottom: -15px;
+      left: 0;
+      width: 100%;
+      height: 20px;
+      fill: #FDF4EB;
+    }
+
+    /* ==========================================================================
+       3. ヒーローセクション（水彩の空・虹・重なる砂漠の丘）
+       ========================================================================== */
+    .hero-container {
+      position: relative;
+      min-height: 520px;
+      background: linear-gradient(180deg, #FAD0BE 0%, #E1EFF9 45%, #FDF3E3 85%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 2.5rem;
+      overflow: hidden;
+    }
+
+    /* 虹のパステルアクセント */
+    .rainbow-bg {
+      position: absolute;
+      top: 10%;
+      right: 12%;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 180deg at 50% 50%,
+        rgba(255, 179, 186, 0.4) 0deg,
+        rgba(255, 223, 186, 0.4) 60deg,
+        rgba(255, 255, 186, 0.4) 120deg,
+        rgba(186, 255, 201, 0.4) 180deg,
+        rgba(186, 225, 255, 0.4) 240deg,
+        transparent 300deg
+      );
+      filter: blur(12px);
+      z-index: 1;
+    }
+
+    .hero-main-visual {
+      position: relative;
+      z-index: 5;
+      text-align: center;
+    }
+
+    .camel-illustration {
+      width: 210px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.3);
+      border: 3px dashed var(--nav-about);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+
+    .camel-emoji {
+      font-size: 4.8rem;
+      animation: float 3.5s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(3deg); }
+    }
+
+    .hero-catch {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--text-brown);
+      background: rgba(255, 255, 255, 0.85);
+      padding: 0.7rem 2rem;
+      border-radius: 30px;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    }
+
+    /* 砂漠の波打つ丘 */
+    .dunes-wrapper {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 160px;
+      z-index: 3;
+    }
+
+    .dune {
+      position: absolute;
+      width: 120%;
+      height: 100%;
+      left: -10%;
+      border-radius: 50% 50% 0 0;
+    }
+
+    .dune-1 { background: var(--dune-1); bottom: -60px; transform: rotate(-2deg); opacity: 0.8; }
+    .dune-2 { background: var(--dune-2); bottom: -80px; transform: rotate(3deg); opacity: 0.9; }
+    .dune-3 { background: var(--dune-3); bottom: -100px; transform: rotate(-1deg); }
+
+    /* ==========================================================================
+       4. 下部浮遊ナビゲーションタブ（4色切り抜きカード）
+       ========================================================================== */
+    .nav-cards-container {
+      position: relative;
+      z-index: 10;
+      margin-top: -35px;
+      padding: 0 1rem 3rem;
+    }
+
+    .nav-cards-grid {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .nav-card {
+      padding: 1.1rem 0.8rem;
+      border-radius: 18px;
+      text-align: center;
+      text-decoration: none;
+      color: #FFF;
+      font-size: 1.15rem;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.25s ease;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .nav-card small { font-size: 0.75rem; font-weight: normal; opacity: 0.95; }
+
+    .card-about { background-color: var(--nav-about); }
+    .card-stories { background-color: var(--nav-stories); }
+    .card-gallery { background-color: var(--nav-gallery); color: var(--text-brown); }
+    .card-contact { background-color: var(--nav-contact); }
+
+    .nav-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    /* ==========================================================================
+       5. コンテンツセクション群（現在のテキストを落とし込んだレイアウト）
+       ========================================================================== */
+    .content-block {
+      background: #FFF;
+      border-radius: 24px;
+      padding: 3rem 2.2rem;
+      margin-bottom: 3.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+      border: 1px solid var(--border-soft);
+    }
+
+    .section-head {
+      text-align: center;
+      margin-bottom: 2.2rem;
+    }
+
+    .section-badge {
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 0.3rem 0.9rem;
+      border-radius: 15px;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title-text { font-size: 1.6rem; color: var(--text-brown); }
+
+    /* ① About Us: 手紙風カード */
+    .letter-paper-box {
+      background: #FFF9F2;
+      border: 2px dashed #E5D3C0;
+      border-radius: 20px;
+      padding: 2.2rem;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    .letter-paper-box::before {
+      content: "“";
+      font-size: 4rem;
+      color: var(--nav-about);
+      position: absolute;
+      top: 5px; left: 15px;
+      opacity: 0.3;
+      font-family: Georgia, serif;
+    }
+
+    .media-card {
+      background: #F4F8FA;
+      border-radius: 14px;
+      padding: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border-left: 5px solid var(--nav-stories);
+    }
+
+    /* ② Stories: 2大絵本カード ＆ 地域別取扱店タブ */
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .book-card {
+      background: #FAF7F2;
+      border-radius: 18px;
+      padding: 1.8rem;
+      border: 1px solid var(--border-soft);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .btn-shop-link {
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      padding: 0.65rem 0;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 0.88rem;
+      text-decoration: none;
+      margin-top: 0.5rem;
+      transition: opacity 0.2s;
+    }
+
+    .btn-base { background: var(--nav-about); color: #fff; }
+    .btn-amazon { background: #E2A055; color: #fff; }
+
+    /* 書店タブ */
+    .tab-buttons {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.5rem 1.2rem;
+      border-radius: 25px;
+      border: 1px solid var(--border-soft);
+      background: #FFF;
+      font-size: 0.88rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--nav-stories);
+      color: #FFF;
+      border-color: var(--nav-stories);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+
+    .store-item { background: #FAF7F2; padding: 1rem; border-radius: 12px; font-size: 0.9rem; }
+
+    /* ③ Gallery: スクラップブック風グリッド */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .gallery-item {
+      background: #FFFDF8;
+      border-radius: 16px;
+      padding: 1.2rem;
+      border: 1px solid var(--border-soft);
+      text-align: center;
+    }
+
+    /* ④ Contact: 実績数字 ＆ アコーディオン */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .stat-box { background: #F8F5EE; padding: 1.2rem; border-radius: 16px; }
+    .stat-num { font-size: 1.8rem; font-weight: bold; color: var(--primary-green); }
+
+    .acc-btn {
+      width: 100%;
+      background: #F4ECE1;
+      border: none;
+      padding: 1rem;
+      border-radius: 12px;
+      font-weight: bold;
+      color: var(--text-brown);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .acc-body { display: none; padding: 1.2rem 0.5rem 0; font-size: 0.9rem; color: var(--text-sub); }
+
+    .bank-card {
+      background: #F2F7F4;
+      border-radius: 16px;
+      padding: 1.5rem;
+      border-left: 6px solid var(--primary-green);
+      margin-top: 2rem;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 768px) {
+      .nav-cards-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-container { grid-template-columns: 1fr; }
+      .logo-text { font-size: 1.8rem; }
+      .hero-catch { font-size: 1.05rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. ちぎり紙ヘッダー -->
+  <header class="header-torn">
+    <div class="header-inner">
+      <a href="#" class="logo-group">
+        <span class="logo-icon">🐪</span>
+        <span class="logo-text">Camelun</span>
+      </a>
+      <span class="header-tagline">絵本・朗読プロジェクト</span>
+    </div>
+    <svg class="header-torn-edge" viewBox="0 0 1200 20" preserveAspectRatio="none">
+      <path d="M0,0 C150,15 350,-5 500,10 C650,25 900,0 1200,12 L1200,0 L0,0 Z"></path>
+    </svg>
+  </header>
+
+  <!-- 2. 水彩空・虹・砂漠の丘ヒーローセクション -->
+  <section class="hero-container">
+    <div class="rainbow-bg"></div>
+
+    <div class="hero-main-visual">
+      <div class="camel-illustration">
+        <span class="camel-emoji">🐪</span>
+        <span style="font-size:0.75rem; font-weight:bold; color:var(--text-brown);">空を飛ぶキャメルン</span>
+      </div>
+      <div class="hero-catch">
+        ママの幸せと子供達の笑顔 そして家族の絆を願って
+      </div>
+    </div>
+
+    <!-- 砂漠の丘レイヤー -->
+    <div class="dunes-wrapper">
+      <div class="dune dune-1"></div>
+      <div class="dune dune-2"></div>
+      <div class="dune dune-3"></div>
+    </div>
+  </section>
+
+  <!-- 3. コンセプト画像同様の4色パステルタブ -->
+  <nav class="nav-cards-container">
+    <div class="nav-cards-grid">
+      <a href="#about" class="nav-card card-about">
+        About Us
+        <small>私たちの想い</small>
+      </a>
+      <a href="#stories" class="nav-card card-stories">
+        Stories
+        <small>絵本作品・取扱店</small>
+      </a>
+      <a href="#gallery" class="nav-card card-gallery">
+        Gallery
+        <small>活動のあゆみ</small>
+      </a>
+      <a href="#contact" class="nav-card card-contact">
+        Contact
+        <small>寄付・支援・お問い合わせ</small>
+      </a>
+    </div>
+  </nav>
+
+  <!-- 4. 各セクション（スクロールで各エリアへ到達） -->
+  <main class="container">
+
+    <!-- ① ABOUT US (ピーチオレンジ) -->
+    <section class="content-block" id="about">
+      <div class="section-head">
+        <span class="section-badge" style="background:#FEE8D6; color:var(--nav-about);">ABOUT US</span>
+        <h2 class="section-title-text">本が生まれたきっかけと想い</h2>
+      </div>
+
+      <div class="letter-paper-box">
+        <h3 style="color:var(--nav-about); font-size:1.2rem; margin-bottom:0.8rem;">「娘の本を作って下さい」</h3>
+        <p style="line-height:1.9; color:var(--text-brown);">
+          3.11東日本大震災の津波で、幼稚園バスの中でわずか6才で天使になった愛梨ちゃん。<br>
+          ママの佐藤美香さん（石巻市）からの「命の大秘さと日々の尊さを伝える為に娘の本を作って下さい」とお手紙を頂いたことから、絵本『あなたをママと呼びたくて…』の制作が始まりました。
+        </p>
+        <p style="text-align:right; font-weight:bold; margin-top:1rem; color:var(--text-sub);">
+          ― 佐藤美香さん / 作者 空羽ファティマ
+        </p>
+      </div>
+
+      <div class="media-card">
+        <span style="font-size:1.8rem;">📺</span>
+        <div>
+          <strong style="font-size:0.95rem;">メディア掲載実績</strong>
+          <p style="font-size:0.85rem; color:var(--text-sub);">NHK『ニュースウオッチ9』『こころフォト』ほか多数のメディアで命を伝える活動が取り上げられました。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ② STORIES (ソフトブルー) -->
+    <section class="content-block" id="stories">
+      <div class="section-head">
+        <span class="section-badge" style="background:#E1EFF9; color:var(--nav-stories);">STORIES</span>
+        <h2 class="section-title-text">絵本作品と取扱書店</h2>
+      </div>
+
+      <!-- 2大絵本カード -->
+      <div class="books-grid">
+        <div class="book-card">
+          <div>
+            <span style="font-size:0.75rem; background:#EBF5F0; color:var(--primary-green); padding:0.2rem 0.6rem; border-radius:10px; font-weight:bold;">震災支援・いのちの絵本</span>
+            <h3 style="font-size:1.15rem; margin:0.5rem 0;">あなたをママと呼びたくて… 天から舞い降りた命</h3>
+            <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1rem;">
+              震災で天使になった愛梨ちゃんとママの強い絆を描いた感動の物語。売上金は経費を除き全額が震災遺児へ寄付されます。
+            </p>
+          </div>
+          <div>
+            <a href="https://camelun.official.ec/" target="_blank" rel="noopener" class="btn-shop-link btn-base">キャメルンショップ (BASE)</a>
+            <a href="http://www.amazon.co.jp/dp/4905430119/" target="_blank" rel="noopener" class="btn-shop-link btn-amazon">Amazonで購入</a>
+          </div>
+        </div>
+
+        <div class="book-card">
+          <div>
+            <span style="font-size:0.75rem; background:#FFF4E5; color:var(--nav-about); padding:0.2rem 0.6rem; border-radius:10px; font-weight:bold;">キャメルン シリーズ第1作</span>
+            <h3 style="font-size:1.15rem; margin:0.5rem 0;">ラクダのキャメルン 空を飛ぶ</h3>
+            <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:1rem;">
+              砂漠に住むパパとママに見せるため、虹を探して旅に出る切り絵本。夢を信じる優しさを届けます。
+            </p>
+          </div>
+          <div>
+            <a href="https://camelun.official.ec/" target="_blank" rel="noopener" class="btn-shop-link btn-base">キャメルンショップ (BASE)</a>
+            <a href="http://www.amazon.co.jp/dp/4286055302/" target="_blank" rel="noopener" class="btn-shop-link btn-amazon">Amazonで購入</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 地域別取扱店タブ -->
+      <h3 style="font-size:1.1rem; text-align:center; margin-bottom:1rem; color:var(--text-brown);">📚 全国の取扱書店</h3>
+      <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchTab(event, 'tab-gunma')">群馬県</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-miyagi')">宮城県</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-tokyo')">東京都</button>
+      </div>
+
+      <div id="tab-gunma" class="tab-panel active">
+        <div class="store-item"><strong>紀伊國屋 前橋店</strong><br><small>けやきウォーク前橋1F</small></div>
+        <div class="store-item"><strong>ブックマンズアカデミー 前橋店</strong><br><small>TEL: 027-280-3222</small></div>
+        <div class="store-item"><strong>ブックマンズアカデミー 高崎店</strong><br><small>ウニクス高崎2F</small></div>
+      </div>
+      <div id="tab-miyagi" class="tab-panel">
+        <div class="store-item"><strong>ヤマト屋書店 全5店舗</strong><br><small>仙台三越店、東仙台店、中里店ほか</small></div>
+        <div class="store-item"><strong>金港堂 石巻店</strong><br><small>TEL: 0225-94-0088</small></div>
+        <div class="store-item"><strong>紀伊國屋 仙台店</strong><br><small>ザ・モール仙台長町3F</small></div>
+      </div>
+      <div id="tab-tokyo" class="tab-panel">
+        <div class="store-item"><strong>紀伊國屋 新宿本店</strong><br><small>TEL: 03-3354-0131</small></div>
+      </div>
+    </section>
+
+    <!-- ③ GALLERY (パステルイエロー) -->
+    <section class="content-block" id="gallery">
+      <div class="section-head">
+        <span class="section-badge" style="background:#FFF9E6; color:#B58917;">GALLERY</span>
+        <h2 class="section-title-text">活動のあゆみ</h2>
+      </div>
+
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">🎵</div>
+          <strong>朗読コンサート・原画展</strong>
+          <p style="font-size:0.82rem; color:var(--text-sub); margin-top:0.4rem;">生演奏に合わせた朗読と原画展を全国各地で開催。</p>
+        </div>
+        <div class="gallery-item">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">🎁</div>
+          <strong>朗読CD 1,800枚寄贈</strong>
+          <p style="font-size:0.82rem; color:var(--text-sub); margin-top:0.4rem;">東北の小中学校や全国の盲学校へ手紙を添えて寄贈。</p>
+        </div>
+        <div class="gallery-item">
+          <div style="font-size:2rem; margin-bottom:0.5rem;">🧸</div>
+          <strong>愛梨＆珠莉人形 旅行記</strong>
+          <p style="font-size:0.82rem; color:var(--text-sub); margin-top:0.4rem;">二人の人形が世界を巡り命の大切さを伝える旅。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ④ CONTACT & SUPPORT (ソフトピンク) -->
+    <section class="content-block" id="contact">
+      <div class="section-head">
+        <span class="section-badge" style="background:#FCEAEB; color:var(--nav-contact);">CONTACT & SUPPORT</span>
+        <h2 class="section-title-text">寄付のご報告と口座案内</h2>
+      </div>
+
+      <!-- 数字の実績 -->
+      <div class="stats-container">
+        <div class="stat-box">
+          <div style="font-size:0.8rem; color:var(--text-sub);">絵本販売</div>
+          <div class="stat-num">1,700冊＋</div>
+        </div>
+        <div class="stat-box">
+          <div style="font-size:0.8rem; color:var(--text-sub);">CD寄贈</div>
+          <div class="stat-num">1,800枚</div>
+        </div>
+        <div class="stat-box">
+          <div style="font-size:0.8rem; color:var(--text-sub);">寄付先</div>
+          <div class="stat-num" style="font-size:1.2rem; margin-top:0.4rem;">あしなが育英会</div>
+        </div>
+      </div>
+
+      <!-- アコーディオン（透明性の高い経費解説） -->
+      <button class="acc-btn" id="accBtn">
+        <span>収益・経費の詳しい使途について見る</span>
+        <span id="accIcon">＋</span>
+      </button>
+      <div class="acc-body" id="accBody">
+        初版2,000部のうち約1,700冊を販売し、朗読会費用、発送経費、第二版の印刷代（一部）を除いた全額をあしなが育英会様へ寄付しております。CD1,800枚もスタッフ一同で手紙を添えて東北の学校等へお届けしました。
+      </div>
+
+      <!-- 振込口座カード -->
+      <div class="bank-card">
+        <h3 style="color:var(--primary-green); font-size:1.05rem; margin-bottom:0.5rem;">🤝 ゆうちょ銀行 振込口座</h3>
+        <p style="font-size:0.88rem; line-height:1.7;">
+          <strong>【名義】</strong> キャメルングループ<br>
+          <strong>【記号・番号】</strong> 10180-88243141 (他金融機関から: 〇一八店 普通 8824314)
+        </p>
+        <button id="copyBtn" style="margin-top:0.8rem; background:var(--primary-green); color:#fff; border:none; padding:0.4rem 1rem; border-radius:6px; font-size:0.8rem; cursor:pointer;">
+          口座情報をコピーする
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 5. フッター -->
+  <footer style="background:#3E3835; color:#C2B9B3; padding:2.5rem 1rem; text-align:center; font-size:0.85rem;">
+    <p style="color:#FFF; font-size:1.2rem; font-weight:bold; margin-bottom:0.5rem;">🐪 Camelun</p>
+    <p>ママの幸せと子供達の笑顔 そして家族の絆を願って</p>
+    <p style="margin-top:1.5rem; color:#887E77;">&copy; Camelun.com All Rights Reserved.</p>
+  </footer>
+
+  <!-- 6. JavaScript (インタラクション) -->
+  <script>
+    // アコーディオン制御
+    const accBtn = document.getElementById('accBtn');
+    const accBody = document.getElementById('accBody');
+    const accIcon = document.getElementById('accIcon');
+
+    accBtn.addEventListener('click', () => {
+      const isOpen = accBody.style.display === 'block';
+      accBody.style.display = isOpen ? 'none' : 'block';
+      accIcon.textContent = isOpen ? '＋' : '－';
+    });
+
+    // 取扱店タブ切り替え
+    function switchTab(e, tabId) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      e.currentTarget.classList.add('active');
+    }
+
+    // 口座情報コピー
+    document.getElementById('copyBtn').addEventListener('click', function() {
+      const info = "【名義】キャメルングループ\n【ゆうちょ銀行】記号: 10180 / 番号: 88243141";
+      navigator.clipboard.writeText(info).then(() => {
+        this.textContent = "コピーしました！";
+        setTimeout(() => this.textContent = "口座情報をコピーする", 2000);
+      });
+    });
+  </script>
+</body>
+</html>
