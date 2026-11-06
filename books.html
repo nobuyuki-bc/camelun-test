@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>出版物のご案内 (Cover Flow View) | Camelun</title>
+  <style>
+    /* ==========================================================================
+       1. 基本スタイル & ダークステージカラー
+       ========================================================================== */
+    :root {
+      --bg-dark-stage: #1A1715;
+      --bg-cream: #FFFDF8;
+      --text-brown: #5C4A42;
+      --text-light: #F7F3EE;
+      --text-sub: #A89F91;
+      --nav-about: #EFA888;
+      --nav-stories: #8FB9CF;
+      --border-soft: #3D3631;
+      --font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark-stage);
+      color: var(--text-light);
+      font-family: var(--font-family);
+      line-height: 1.8;
+      overflow-x: hidden;
+      padding-bottom: 3rem;
+    }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ちぎり紙ヘッダー */
+    .header-torn {
+      position: relative;
+      background: #FDF4EB;
+      padding: 1rem 2rem 2rem;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
+
+    .logo-icon { font-size: 2rem; transform: rotate(-5deg); }
+    .logo-text { font-size: 2rem; font-weight: bold; color: var(--text-brown); }
+
+    .header-torn-edge {
+      position: absolute;
+      bottom: -15px; left: 0; width: 100%; height: 20px;
+      fill: #FDF4EB;
+    }
+
+    /* タイトルセクション */
+    .page-title {
+      text-align: center;
+      padding: 2.5rem 0 0.5rem;
+    }
+
+    .page-title h1 { font-size: 1.8rem; color: #FFF; letter-spacing: 0.05em; }
+    .page-title p { font-size: 0.88rem; color: var(--text-sub); margin-top: 0.3rem; }
+
+    /* ==========================================================================
+       2. Three.js 3Dステージ
+       ========================================================================== */
+    #canvas-container {
+      width: 100%;
+      height: 420px;
+      position: relative;
+      margin: 1rem 0;
+      cursor: grab;
+    }
+
+    #canvas-container:active {
+      cursor: grabbing;
+    }
+
+    /* レンジスライダー */
+    .slider-control-wrap {
+      max-width: 450px;
+      margin: 0.5rem auto 2rem;
+      text-align: center;
+    }
+
+    input[type="range"]#rangeSlider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      background: #332E29;
+      border-radius: 10px;
+      border: 1px solid #524B43;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]#rangeSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 50px;
+      height: 16px;
+      border-radius: 10px;
+      background: #8E8478;
+      border: 1px solid #FFF;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      cursor: grab;
+      transition: background 0.2s;
+    }
+
+    input[type="range"]#rangeSlider::-webkit-slider-thumb:hover {
+      background: var(--nav-about);
+    }
+
+    /* アクティブ作品カード案内 */
+    .active-book-info {
+      background: #2A2521;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      border: 1px solid var(--border-soft);
+      max-width: 680px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .active-book-title { font-size: 1.35rem; color: #FFF; margin-bottom: 0.6rem; }
+    .active-book-desc { font-size: 0.92rem; color: var(--text-sub); line-height: 1.8; margin-bottom: 1.5rem; }
+
+    .action-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      padding: 0.65rem 1.6rem;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-base { background: var(--nav-about); color: #FFF; }
+    .btn-amazon { background: #E2A055; color: #FFF; }
+    .btn-action:hover { transform: translateY(-2px); }
+  </style>
+
+  <!-- Three.js & GSAP 外部ライブラリ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+</head>
+<body>
+
+  <!-- ちぎり紙ヘッダー -->
+  <header class="header-torn">
+    <div class="header-inner">
+      <a href="index.html" class="logo-group">
+        <span class="logo-icon">🐪</span>
+        <span class="logo-text">Camelun</span>
+      </a>
+      <span style="font-size: 0.85rem; font-weight: bold; color: var(--text-brown);">出版物のご案内</span>
+    </div>
+    <svg class="header-torn-edge" viewBox="0 0 1200 20" preserveAspectRatio="none">
+      <path d="M0,0 C150,15 350,-5 500,10 C650,25 900,0 1200,12 L1200,0 L0,0 Z"></path>
+    </svg>
+  </header>
+
+  <div class="container">
+    <div class="page-title">
+      <h1>出版物のご案内 (3D Cover Flow View)</h1>
+      <p>下のスクロールバー、ドラッグ、ホイール、またはキーボード（← →）で表紙をめくれます</p>
+    </div>
+
+    <!-- Three.js キャンバスコンテナ -->
+    <div id="canvas-container"></div>
+
+    <!-- スライドコントロール -->
+    <div class="slider-control-wrap">
+      <input type="range" id="rangeSlider" min="0" max="12" value="0" step="1">
+    </div>
+
+    <!-- アクティブ情報カード -->
+    <div class="active-book-info">
+      <h2 class="active-book-title" id="infoTitle">作品タイトル</h2>
+      <p class="active-book-desc" id="infoDesc">解説文がここに表示されます。</p>
+      <div class="action-group">
+        <a href="https://camelun.official.ec/" target="_blank" rel="noopener" class="btn-action btn-base">キャメルンショップで購入</a>
+        <a href="http://www.amazon.co.jp/" target="_blank" rel="noopener" class="btn-action btn-amazon">Amazonで購入</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 指定された booksData
+    const booksData = [
+      {
+        title: "ラクダのキャメルン 空を飛ぶ",
+        desc: "虹を探して旅に出るキャメルンの冒険。自分を信じる大切さを伝えます。",
+        image: "images/book1.png"
+      },
+      {
+        title: "キャメルン人魚に恋をする",
+        desc: "恋した人魚の国に入るため心を明け渡したキャメルンの再生ストーリー。",
+        image: "images/book2.png"
+      },
+      {
+        title: "魔女っ子ナイルのひとり旅",
+        desc: "ママが子供に伝えるべき一番大切なことや自信を持つ大切さを描きます。",
+        image: "images/book3.png"
+      },
+      {
+        title: "黒い孔雀ウパシナとの出会い",
+        desc: "自分を受け入れること、イジメと差別、母性をテーマにした本。",
+        image: "images/book4.png"
+      },
+      {
+        title: "キャメリー誕生",
+        desc: "理想の母親になれない自分を責めて苦しむママの肩を抱いてくれる一冊。",
+        image: "images/book5.png"
+      },
+      {
+        title: "ウパシナの母サーシャの物語",
+        desc: "東北被災地に捧げる本。情熱的な70分CDが付属。",
+        image: "images/book6.png"
+      },
+      {
+        title: "ムーシカの世界",
+        desc: "砂漠の賢者ムーシカが語る日々の尊さと生きている奇跡。",
+        image: "images/book7.png"
+      },
+      {
+        title: "言葉",
+        desc: "美しく切ない魔女おばばの若き日のLOVEストーリー。",
+        image: "images/book8.png"
+      },
+      {
+        title: "ナイルとちびっこくじら",
+        desc: "東北の子どもたちと一緒に作ったチャリティ絵本。",
+        image: "images/book9.png"
+      },
+      {
+        title: "自由",
+        desc: "お金と自由を得るため月との約束を破った男の物語。",
+        image: "images/book10.png"
+      },
+      {
+        title: "今ある命",
+        desc: "限りある日々を生きる者たちの命のぬくもりを描く作品。",
+        image: "images/book11.png"
+      },
+      {
+        title: "あなたをママと呼びたくて…",
+        desc: "3.11津波で犠牲になった愛梨ちゃんとママの絆を描いた物語。",
+        image: "images/book12.png"
+      },
+      {
+        title: "明日の夕日",
+        desc: "過去のトラウマと向き合い新しい自分に出会うシリーズ初の長編小説。",
+        image: "images/book13.png"
+      }
+    ];
+
+    const container = document.getElementById('canvas-container');
+    const rangeSlider = document.getElementById('rangeSlider');
+    const ITEM_W = 180;
+    const ITEM_H = 245;
+    const MARGIN_X = 55;
+    let currentIndex = 0;
+
+    // 1. Scene, Camera, Renderer のセットアップ
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / 420, 1, 2000);
+    camera.position.set(0, 0, 580);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, 420);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // ライティング（スポットライト効果）
+    const pointLight = new THREE.PointLight(0xffffff, 2.2, 1000);
+    pointLight.position.set(0, 40, 380);
+    scene.add(pointLight);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    scene.add(ambientLight);
+
+    // 画像未読み込み時のパステルフォールバックテクスチャ生成
+    function createFallbackTexture(title, index) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256; canvas.height = 340;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = index % 2 === 0 ? '#FFE8D6' : '#E8F3ED';
+      ctx.fillRect(0, 0, 256, 340);
+      ctx.fillStyle = '#5C4A42';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // 簡易改行処理
+      const line1 = title.substring(0, 10);
+      const line2 = title.substring(10, 20);
+      ctx.fillText(line1, 128, 150);
+      if (line2) ctx.fillText(line2, 128, 180);
+
+      return new THREE.CanvasTexture(canvas);
+    }
+
+    const textureLoader = new THREE.TextureLoader();
+    const cards = [];
+
+    // 2. メッシュの生成 (表紙 + 床面反転リフレクション)
+    booksData.forEach((data, index) => {
+      const cardGroup = new THREE.Group();
+
+      const fallbackTex = createFallbackTexture(data.title, index);
+
+      // 上面（表紙）マテリアル
+      const matTop = new THREE.MeshLambertMaterial({ map: fallbackTex, side: THREE.FrontSide });
+      const meshTop = new THREE.Mesh(new THREE.PlaneGeometry(ITEM_W, ITEM_H), matTop);
+      cardGroup.add(meshTop);
+
+      // 下面（床の反射）マテリアル
+      const matBottom = new THREE.MeshLambertMaterial({
+        map: fallbackTex,
+        transparent: true,
+        opacity: 0.22,
+        side: THREE.BackSide
+      });
+      const meshBottom = new THREE.Mesh(new THREE.PlaneGeometry(ITEM_W, ITEM_H), matBottom);
+      meshBottom.rotation.y = Math.PI;
+      meshBottom.rotation.z = Math.PI;
+      meshBottom.position.y = -ITEM_H - 4;
+      cardGroup.add(meshBottom);
+
+      // 画像の非同期ロード処理
+      textureLoader.load(
+        data.image,
+        (loadedTex) => {
+          loadedTex.colorSpace = THREE.SRGBColorSpace;
+          matTop.map = loadedTex;
+          matTop.needsUpdate = true;
+          matBottom.map = loadedTex;
+          matBottom.needsUpdate = true;
+        },
+        undefined,
+        (err) => {
+          // 画像が無い場合はフォールバックテクスチャをそのまま維持
+        }
+      );
+
+      cardGroup.userData = { index: index, data: data };
+      scene.add(cardGroup);
+      cards.push(cardGroup);
+    });
+
+    // 3. GSAP による Cover Flow トゥイーンアニメーション
+    function updateCoverFlow() {
+      const id = currentIndex;
+
+      cards.forEach((card, i) => {
+        let targetX = MARGIN_X * (i - id);
+        let targetZ = 0;
+        let targetRot = 0;
+
+        if (i < id) {
+          targetX -= ITEM_W * 0.65;
+          targetZ = -120;
+          targetRot = -0.85; // -48.7度
+        } else if (i > id) {
+          targetX += ITEM_W * 0.65;
+          targetZ = -120;
+          targetRot = 0.85;  // +48.7度
+        } else {
+          targetX = 0;
+          targetZ = 100;
+          targetRot = 0;
+        }
+
+        // GSAP での位置・角度の移動
+        gsap.to(card.position, { x: targetX, z: targetZ, duration: 1.0, ease: "expo.out", overwrite: true });
+        gsap.to(card.rotation, { y: targetRot, duration: 0.8, ease: "expo.out", overwrite: true });
+      });
+
+      // 情報UI & スライダー同期
+      const activeData = booksData[currentIndex];
+      document.getElementById('infoTitle').textContent = activeData.title;
+      document.getElementById('infoDesc').textContent = activeData.desc;
+      rangeSlider.value = currentIndex;
+    }
+
+    // レンダリングループ
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // 4. 操作インタラクション
+    rangeSlider.addEventListener('input', (e) => {
+      currentIndex = parseInt(e.target.value);
+      updateCoverFlow();
+    });
+
+    // キーボード操作
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' && currentIndex > 0) {
+        currentIndex--; updateCoverFlow();
+      } else if (e.key === 'ArrowRight' && currentIndex < booksData.length - 1) {
+        currentIndex++; updateCoverFlow();
+      }
+    });
+
+    // ホイール操作
+    window.addEventListener('wheel', (e) => {
+      if (e.deltaY > 0 && currentIndex < booksData.length - 1) {
+        currentIndex++; updateCoverFlow();
+      } else if (e.deltaY < 0 && currentIndex > 0) {
+        currentIndex--; updateCoverFlow();
+      }
+    }, { passive: true });
+
+    // リサイズ対応
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / 420;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, 420);
+    });
+
+    // 初期化
+    updateCoverFlow();
+  </script>
+</body>
+</html>
