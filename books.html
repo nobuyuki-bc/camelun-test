@@ -387,67 +387,74 @@
       cards.push(cardGroup);
     });
 
+// マテリアルの生成時（※既存のカード生成ループ内）に depthTest: false を指定
+// matTop = new THREE.MeshLambertMaterial({ map: texture, side: THREE.FrontSide, depthTest: false });
+// matBottom = new THREE.MeshLambertMaterial({ map: texture, transparent: true, opacity: 0.22, side: THREE.BackSide, depthTest: false });
+
 	function updateCoverFlow() {
 	  const id = currentIndex;
 
 	  cards.forEach((card, i) => {
 	    // 1. 各カードの横長スケール（scale.x）を取得
-	    // ※表紙メッシュ（meshTop）のスケールを参照
-	    const currentScaleX = card.children[0] ? card.children[0].scale.x : 1;
+	    const currentScaleX = card.children && card.children[0] ? card.children[0].scale.x : 1;
 
-	    // 横長画像ほど回転時に手前に突き出るため、その分だけ奥（-Z）へ引き込み、X間隔も広げる補正値
-	    const extraZOffset = (currentScaleX - 1) * 70; // 奥へ引っ込める量
-	    const extraXOffset = (currentScaleX - 1) * 45; // 横幅が広いため開ける隙間
+	    // 横長画像用の安全マージン（数値強化）
+	    const extraZOffset = (currentScaleX - 1) * 100; // 奥へ引く量
+	    const extraXOffset = (currentScaleX - 1) * 70;  // 横に開ける間隔
 
 	    let targetX = MARGIN_X * (i - id);
 	    let targetZ = 0;
 	    let targetRot = 0;
 
 	    if (i < id) {
-	      // 左側のカード
-	      targetX -= (ITEM_W * 0.65 + extraXOffset);
-	      targetZ = -150 - extraZOffset; // 横長なほど奥へ退避
+	      // 左側カード
+	      targetX -= (ITEM_W * 0.7 + extraXOffset);
+	      targetZ = -200 - extraZOffset; // しっかり奥へ退避
 	      targetRot = -0.85;             // -48.7度
 	    } else if (i > id) {
-	      // 右側のカード
-	      targetX += (ITEM_W * 0.65 + extraXOffset);
-	      targetZ = -150 - extraZOffset; // 横長なほど奥へ退避
+	      // 右側カード
+	      targetX += (ITEM_W * 0.7 + extraXOffset);
+	      targetZ = -200 - extraZOffset; // しっかり奥へ退避
 	      targetRot = 0.85;              // +48.7度
 	    } else {
-	      // 中央（前面）のカード
+	      // 中央（アクティブ）カード
 	      targetX = 0;
-	      targetZ = 130;                 // 手前にしっかり引き出し
+	      targetZ = 190;                 // 手前に大きく引き出し
 	      targetRot = 0;
 	    }
 
 	    const distance = Math.abs(i - id);
 
-	    // ★【重要】描画の優先度（renderOrder）を中央ほど高く設定
-	    // これによりアニメーション移動の途中でも重ね順が崩れなくなります
+	    // 描画順序の完全固定
 	    const sortOrder = 1000 - distance;
 	    card.renderOrder = sortOrder;
 	    card.children.forEach(child => {
 	      child.renderOrder = sortOrder;
+	      // 深度テストを無効にして renderOrder を絶対優先にする
+	      if (child.material) {
+	        child.material.depthTest = false;
+	      }
 	    });
 
-	    // GSAPによるスムーズな移動アニメーション
+	    // 2. 位置移動（0.9秒）
 	    gsap.to(card.position, { 
 	      x: targetX, 
 	      z: targetZ, 
-	      duration: 1.0, 
+	      duration: 0.9, 
 	      ease: "expo.out", 
 	      overwrite: true 
 	    });
 	    
+	    // 3. 回転移動（0.5秒 - 位置より早く回転を終えて突っかかりを防止）
 	    gsap.to(card.rotation, { 
 	      y: targetRot, 
-	      duration: 0.8, 
-	      ease: "expo.out", 
+	      duration: 0.5, 
+	      ease: "power2.out", 
 	      overwrite: true 
 	    });
 	  });
 
-	  // 情報UI & スライダー同期
+	  // UI更新
 	  const activeData = booksData[currentIndex];
 	  if (activeData) {
 	    document.getElementById('infoTitle').textContent = activeData.title;
@@ -455,7 +462,7 @@
 	    rangeSlider.value = currentIndex;
 	  }
 	}
-
+	
     // レンダリングループ
     function animate() {
       requestAnimationFrame(animate);
