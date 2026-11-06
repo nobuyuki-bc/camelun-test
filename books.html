@@ -387,40 +387,74 @@
       cards.push(cardGroup);
     });
 
-    // 3. GSAP による Cover Flow トゥイーンアニメーション
-    function updateCoverFlow() {
-      const id = currentIndex;
+	function updateCoverFlow() {
+	  const id = currentIndex;
 
-      cards.forEach((card, i) => {
-        let targetX = MARGIN_X * (i - id);
-        let targetZ = 0;
-        let targetRot = 0;
+	  cards.forEach((card, i) => {
+	    // 1. 各カードの横長スケール（scale.x）を取得
+	    // ※表紙メッシュ（meshTop）のスケールを参照
+	    const currentScaleX = card.children[0] ? card.children[0].scale.x : 1;
 
-        if (i < id) {
-          targetX -= ITEM_W * 0.65;
-          targetZ = -120;
-          targetRot = -0.85; // -48.7度
-        } else if (i > id) {
-          targetX += ITEM_W * 0.65;
-          targetZ = -120;
-          targetRot = 0.85;  // +48.7度
-        } else {
-          targetX = 0;
-          targetZ = 100;
-          targetRot = 0;
-        }
+	    // 横長画像ほど回転時に手前に突き出るため、その分だけ奥（-Z）へ引き込み、X間隔も広げる補正値
+	    const extraZOffset = (currentScaleX - 1) * 70; // 奥へ引っ込める量
+	    const extraXOffset = (currentScaleX - 1) * 45; // 横幅が広いため開ける隙間
 
-        // GSAP での位置・角度の移動
-        gsap.to(card.position, { x: targetX, z: targetZ, duration: 1.0, ease: "expo.out", overwrite: true });
-        gsap.to(card.rotation, { y: targetRot, duration: 0.8, ease: "expo.out", overwrite: true });
-      });
+	    let targetX = MARGIN_X * (i - id);
+	    let targetZ = 0;
+	    let targetRot = 0;
 
-      // 情報UI & スライダー同期
-      const activeData = booksData[currentIndex];
-      document.getElementById('infoTitle').textContent = activeData.title;
-      document.getElementById('infoDesc').textContent = activeData.desc;
-      rangeSlider.value = currentIndex;
-    }
+	    if (i < id) {
+	      // 左側のカード
+	      targetX -= (ITEM_W * 0.65 + extraXOffset);
+	      targetZ = -150 - extraZOffset; // 横長なほど奥へ退避
+	      targetRot = -0.85;             // -48.7度
+	    } else if (i > id) {
+	      // 右側のカード
+	      targetX += (ITEM_W * 0.65 + extraXOffset);
+	      targetZ = -150 - extraZOffset; // 横長なほど奥へ退避
+	      targetRot = 0.85;              // +48.7度
+	    } else {
+	      // 中央（前面）のカード
+	      targetX = 0;
+	      targetZ = 130;                 // 手前にしっかり引き出し
+	      targetRot = 0;
+	    }
+
+	    const distance = Math.abs(i - id);
+
+	    // ★【重要】描画の優先度（renderOrder）を中央ほど高く設定
+	    // これによりアニメーション移動の途中でも重ね順が崩れなくなります
+	    const sortOrder = 1000 - distance;
+	    card.renderOrder = sortOrder;
+	    card.children.forEach(child => {
+	      child.renderOrder = sortOrder;
+	    });
+
+	    // GSAPによるスムーズな移動アニメーション
+	    gsap.to(card.position, { 
+	      x: targetX, 
+	      z: targetZ, 
+	      duration: 1.0, 
+	      ease: "expo.out", 
+	      overwrite: true 
+	    });
+	    
+	    gsap.to(card.rotation, { 
+	      y: targetRot, 
+	      duration: 0.8, 
+	      ease: "expo.out", 
+	      overwrite: true 
+	    });
+	  });
+
+	  // 情報UI & スライダー同期
+	  const activeData = booksData[currentIndex];
+	  if (activeData) {
+	    document.getElementById('infoTitle').textContent = activeData.title;
+	    document.getElementById('infoDesc').textContent = activeData.desc;
+	    rangeSlider.value = currentIndex;
+	  }
+	}
 
     // レンダリングループ
     function animate() {
