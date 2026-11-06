@@ -174,7 +174,9 @@
         <span class="logo-icon">🐪</span>
         <span class="logo-text">Camelun</span>
       </a>
+      <!--
       <span style="font-size: 0.85rem; font-weight: bold; color: var(--text-brown);">出版物のご案内</span>
+      -->
     </div>
     <svg class="header-torn-edge" viewBox="0 0 1200 20" preserveAspectRatio="none">
       <path d="M0,0 C150,15 350,-5 500,10 C650,25 900,0 1200,12 L1200,0 L0,0 Z"></path>
@@ -182,11 +184,11 @@
   </header>
 
   <div class="container">
-	<!--
+    <!--
     <div class="page-title">
       <h1>出版物のご案内</h1>
     </div>
-	-->
+    -->
 
     <!-- Three.js キャンバスコンテナ -->
     <div id="canvas-container"></div>
@@ -355,6 +357,20 @@
         data.image,
         (loadedTex) => {
           loadedTex.colorSpace = THREE.SRGBColorSpace;
+          
+	    // 1. 元画像の幅と高さを取得してアスペクト比を計算
+	    const imgW = loadedTex.image.width;
+	    const imgH = loadedTex.image.height;
+	    const aspect = imgW / imgH; // 縦横比 (例: 0.707)
+
+	    // 2. 高さを基準（ITEM_H）にして、アスペクト比に合った正しく美しい横幅を算出
+	    const fitWidth = ITEM_H * aspect;
+	    const scaleX = fitWidth / ITEM_W;
+
+	    // 3. 表紙メッシュと床の反射メッシュの横スケールを調整
+	    meshTop.scale.x = scaleX;
+	    meshBottom.scale.x = scaleX;          
+          
           matTop.map = loadedTex;
           matTop.needsUpdate = true;
           matBottom.map = loadedTex;
