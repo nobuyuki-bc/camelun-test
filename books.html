@@ -441,6 +441,43 @@
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, 420);
     });
+    
+	// ==========================================
+	// スマホのタッチ（スワイプ）操作対応
+	// ==========================================
+	let touchStartX = 0;
+	let touchEndX = 0;
+
+	const touchTarget = document.getElementById('canvas-container');
+
+	// タッチ開始時の位置を取得
+	touchTarget.addEventListener('touchstart', (e) => {
+	  touchStartX = e.changedTouches[0].screenX;
+	}, { passive: true });
+
+	// タッチ終了時の位置と比較してスワイプ判定
+	touchTarget.addEventListener('touchend', (e) => {
+	  touchEndX = e.changedTouches[0].screenX;
+	  handleSwipe();
+	}, { passive: true });
+
+	function handleSwipe() {
+	  const swipeThreshold = 30; // スワイプとみなす最小の指の移動距離(px)
+
+	  if (touchEndX < touchStartX - swipeThreshold) {
+	    // 左へスワイプ（次の本へ）
+	    if (currentIndex < booksData.length - 1) {
+	      currentIndex++;
+	      updateCoverFlow();
+	    }
+	  } else if (touchEndX > touchStartX + swipeThreshold) {
+	    // 右へスワイプ（前の本へ）
+	    if (currentIndex > 0) {
+	      currentIndex--;
+	      updateCoverFlow();
+	    }
+	  }
+	}    
 
     // 初期化
     updateCoverFlow();
