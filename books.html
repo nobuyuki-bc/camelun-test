@@ -458,11 +458,36 @@
 	  });
 
 	  // UI更新
-	  const activeData = booksData[currentIndex];
-	  if (activeData) {
-	    document.getElementById('infoTitle').textContent = activeData.title;
-	    document.getElementById('infoDesc').textContent = activeData.desc;
-	    rangeSlider.value = currentIndex;
+	  // ==========================================
+	  // 説明文のやわらかいフェードアニメーション
+	  // ==========================================
+	  const infoCard = document.querySelector('.active-book-info');
+
+	  if (infoCard) {
+	    // 1. スッと透明にしつつ、わずかに下へ沈める（フェードアウト）
+	    gsap.to(infoCard, {
+	      opacity: 0,
+	      y: 8,
+	      duration: 0.18,
+	      ease: "power1.out",
+	      onComplete: () => {
+	        // 2. フェードアウト完了後にテキストとスライダーを更新
+	        const activeData = booksData[currentIndex];
+	        if (activeData) {
+	          document.getElementById('infoTitle').textContent = activeData.title;
+	          document.getElementById('infoDesc').textContent = activeData.desc;
+	          rangeSlider.value = currentIndex;
+	        }
+
+	        // 3. ふわっと不透明に戻しつつ、元の高さへ浮き上がらせる（フェードイン）
+	        gsap.to(infoCard, {
+	          opacity: 1,
+	          y: 0,
+	          duration: 0.35,
+	          ease: "power2.out"
+	        });
+	      }
+	    });
 	  }
 	}
 
