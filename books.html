@@ -85,6 +85,13 @@
       cursor: grab;
     }
 
+	/* ★スマホ表示時（画面幅768px以下）は高さを抑える */
+	@media (max-width: 768px) {
+	  #canvas-container {
+	    height: 300px;
+	    margin: 0.5rem 0;
+	  }
+
     #canvas-container:active {
       cursor: grabbing;
     }
@@ -335,7 +342,7 @@
       const fallbackTex = createFallbackTexture(data.title, index);
 
       // 上面（表紙）マテリアル
-      const matTop = new THREE.MeshLambertMaterial({ map: fallbackTex, side: THREE.FrontSide });
+      const matTop = new THREE.MeshLambertMaterial({ map: fallbackTex, side: THREE.FrontSide, depthTest: true, depthWrite: true });
       const meshTop = new THREE.Mesh(new THREE.PlaneGeometry(ITEM_W, ITEM_H), matTop);
       cardGroup.add(meshTop);
 
@@ -344,7 +351,9 @@
         map: fallbackTex,
         transparent: true,
         opacity: 0.22,
-        side: THREE.BackSide
+        side: THREE.BackSide,
+        depthTest: true,
+        depthWrite: false
       });
       const meshBottom = new THREE.Mesh(new THREE.PlaneGeometry(ITEM_W, ITEM_H), matBottom);
       meshBottom.rotation.y = Math.PI;
@@ -391,67 +400,60 @@
 // matTop = new THREE.MeshLambertMaterial({ map: texture, side: THREE.FrontSide, depthTest: false });
 // matBottom = new THREE.MeshLambertMaterial({ map: texture, transparent: true, opacity: 0.22, side: THREE.BackSide, depthTest: false });
 
+
+	// 画面サイズに応じたカメラ位置・サイズの自動調整関数
+	function updateCameraAspect() {
+	  const isMobile = window.innerWidth < 768;
+	  const h = isMobile ? 300 : 420;
+	  
+	  camera.aspect = container.clientWidth / h;
+	  // スマホ表示時はカメラ位置を Z=700 に引いて画像をコンパクトに表示
+	  camera.position.z = isMobile ? 700 : 580; 
+	  camera.updateProjectionMatrix();
+	  renderer.setSize(container.clientWidth, h);
+	}
+
+
 	function updateCoverFlow() {
 	  const id = currentIndex;
 
 	  cards.forEach((card, i) => {
-	    // 1. 各カードの横長スケール（scale.x）を取得
-	    const currentScaleX = card.children && card.children[0] ? card.children[0].scale.x : 1;
+	    const currentScaleX = card.children[0] ? card.children[0].scale.x : 1;
 
-	    // 横長画像用の安全マージン（数値強化）
-	    const extraZOffset = (currentScaleX - 1) * 100; // 奥へ引く量
-	    const extraXOffset = (currentScaleX - 1) * 70;  // 横に開ける間隔
+	    const extraZOffset = (currentScaleX - 1) * 90;
+	    const extraXOffset = (currentScaleX - 1) * 60;
 
 	    let targetX = MARGIN_X * (i - id);
 	    let targetZ = 0;
 	    let targetRot = 0;
 
 	    if (i < id) {
-	      // 左側カード
 	      targetX -= (ITEM_W * 0.7 + extraXOffset);
-	      targetZ = -200 - extraZOffset; // しっかり奥へ退避
-	      targetRot = -0.85;             // -48.7度
+	      targetZ = -190 - extraZOffset;
+	      targetRot = -0.85;
 	    } else if (i > id) {
-	      // 右側カード
 	      targetX += (ITEM_W * 0.7 + extraXOffset);
-	      targetZ = -200 - extraZOffset; // しっかり奥へ退避
-	      targetRot = 0.85;              // +48.7度
+	      targetZ = -190 - extraZOffset;
+	      targetRot = 0.85;
 	    } else {
-	      // 中央（アクティブ）カード
 	      targetX = 0;
-	      targetZ = 190;                 // 手前に大きく引き出し
+	      targetZ = 160;
 	      targetRot = 0;
 	    }
 
 	    const distance = Math.abs(i - id);
 
-	    // 描画順序の完全固定
-	    const sortOrder = 1000 - distance;
-	    card.renderOrder = sortOrder;
-	    card.children.forEach(child => {
-	      child.renderOrder = sortOrder;
-	      // 深度テストを無効にして renderOrder を絶対優先にする
-	      if (child.material) {
-	        child.material.depthTest = false;
-	      }
-	    });
-
-	    // 2. 位置移動（0.9秒）
-	    gsap.to(card.position, { 
-	      x: targetX, 
-	      z: targetZ, 
-	      duration: 0.9, 
-	      ease: "expo.out", 
-	      overwrite: true 
-	    });
+	    // ★【重要】本体画像(meshTop)と床反射(meshBottom)の絶対的な前後関係を指定
+	    const baseOrder = (100 - distance) * 10;
+	    card.renderOrder = baseOrder;
 	    
-	    // 3. 回転移動（0.5秒 - 位置より早く回転を終えて突っかかりを防止）
-	    gsap.to(card.rotation, { 
-	      y: targetRot, 
-	      duration: 0.5, 
-	      ease: "power2.out", 
-	      overwrite: true 
-	    });
+	    const meshTop = card.children[0];
+	    const meshBottom = card.children[1];
+	    if (meshBottom) meshBottom.renderOrder = baseOrder;     // 床の反射
+	    if (meshTop)    meshTop.renderOrder    = baseOrder + 1; // 本体の表紙（必ず前に描画）
+
+	    gsap.to(card.position, { x: targetX, z: targetZ, duration: 0.9, ease: "expo.out", overwrite: true });
+	    gsap.to(card.rotation, { y: targetRot, duration: 0.5, ease: "power2.out", overwrite: true });
 	  });
 
 	  // UI更新
@@ -462,6 +464,7 @@
 	    rangeSlider.value = currentIndex;
 	  }
 	}
+
 	
     // レンダリングループ
     function animate() {
@@ -500,6 +503,10 @@
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, 420);
     });
+    
+	    // リサイズイベントおよび初期化時に実行
+	window.addEventListener('resize', updateCameraAspect);
+	updateCameraAspect();
     
 	// ==========================================
 	// スマホのタッチ（スワイプ）操作対応
